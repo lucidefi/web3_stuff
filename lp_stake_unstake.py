@@ -5,6 +5,7 @@ from random import randint
 from datetime import datetime
 import time
 import math
+import numpy as np
 
 INFURA_KEY_RESERVE = ['',''] # if you have multiple infura keys, you can place the end part here - somethihg like '51ec326cef934ba4b4ff2850a6c74f47'
 
@@ -173,13 +174,87 @@ def get_all_lp_bal_2(walletID=None, storage_contract_w3=None, lpl=None):
         lpl = create_withdraw_lp_list(walletID=walletID, storage_contract_w3=storage_contract_w3)
     wdl = create_withdraw_lists(lp_list=lpl, walletID=walletID, storage_contract_w3=storage_contract_w3, ratio=1.0)
     return lpl, wdl
+def show_balance(wallet_addr):
+    w3= create_w3_from_reserve(key_reserve_list=INFURA_KEY_RESERVE)
+    st_addr ="0xC3eDf24036150B7d90724007a767644812C5973B"
+    storage_abi_str = '[{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"_target","type":"address"}],' \
+                      '"name":"Log","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address",' \
+                      '"name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner",' \
+                      '"type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":' \
+                      '[{"indexed":true,"internalType":"address","name":"account","type":"address"}],"name":"WhitelistAdminAdded"' \
+                      ',"type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"account",' \
+                      '"type":"address"}],"name":"WhitelistAdminRemoved","type":"event"},{"anonymous":false,"i' \
+                      'nputs":[{"indexed":true,"internalType":"address","name":"account","type":"address"}],' \
+                      '"name":"WhitelistedAdded","type":"event"},{"anonymous":false,' \
+                      '"inputs":[{"indexed":true,"internalType":"address","name":"account","type":"address"}],' \
+                      '"name":"WhitelistedRemoved","type":"event"},{"inputs":[{"internalType":"address",' \
+                      '"name":"_target","type":"address"},{"internalType":"address","name":"_pair",' \
+                      '"type":"address"},{"internalType":"uint256","name":"_amt","type":"uint256"}],' \
+                      '"name":"AddTokenBalance","outputs":[],"stateMutability":"nonpayable",' \
+                      '"type":"function"},{"inputs":[{"internalType":"address","name":"' \
+                      '_target","type":"address"},{"internalType":"address","name":"_pair","type":"address"}' \
+                      ',{"internalType":"uint256","name":"_amt","type":"uint256"}],"name":"AddUSDUnitPrice",' \
+                      '"outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":' \
+                      '[{"internalType":"address","name":"user","type":"address"}],"name":"GetInvestList"' \
+                      ',"outputs":[{"internalType":"address[]","name":"","type":"address[]"}],' \
+                      '"stateMutability":"view","type":"function"},' \
+                      '{"inputs":[{"internalType":"address","name":"_target","type":"address"},' \
+                      '{"internalType":"address","name":"_pair","type":"address"}],' \
+                      '"name":"GetTokenBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],' \
+                      '"stateMutability":"view","type":"function"},' \
+                      '{"inputs":[{"internalType":"address","name":"_target","type":"address"},' \
+                      '{"internalType":"address","name":"_pair","type":"address"}],' \
+                      '"name":"GetUSDUnitPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],' \
+                      '"stateMutability":"view","type":"function"},' \
+                      '{"inputs":[{"internalType":"address","name":"_token","type":"address"},' \
+                      '{"internalType":"address","name":"_target","type":"address"},' \
+                      '{"internalType":"uint256","name":"_amt","type":"uint256"}],' \
+                      '"name":"Send","outputs":[],"stateMutability":"nonpayable","type":"function"},' \
+                      '{"inputs":[{"internalType":"address","name":"_target","type":"address"},' \
+                      '{"internalType":"address","name":"_pair","type":"address"},' \
+                      '{"internalType":"uint256","name":"_new_balance","type":"uint256"}],' \
+                      '"name":"SetTokenBalance","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_target","type":"address"},{"internalType":"address","name":"_pair","type":"address"},{"internalType":"uint256","name":"_amt","type":"uint256"}],"name":"SubUSDUnitPrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_target","type":"address"},{"internalType":"address","name":"_pair","type":"address"},{"internalType":"uint256","name":"_amt","type":"uint256"},{"internalType":"uint256","name":"_amtUSD","type":"uint256"}],"name":"UpdateUSDUnitPrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"addWhitelistAdmin","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"addWhitelisted","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"emergencyETHWithdrawal","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"emergencyTokenWithdrawal","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"isOwner","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"isWhitelistAdmin","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"isWhitelisted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"removeWhitelisted","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"renounceWhitelistAdmin","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"renounceWhitelisted","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"selfDesturctor","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}]'
+    storage_abi = json.loads(storage_abi_str)
+    storage = w3.eth.contract(address=st_addr, abi=storage_abi)
 
+    lp_list = storage.functions.GetInvestList(wallet_addr).call()
+    tb=[]
+    for lp in lp_list:
+        tb.append(storage.functions.GetTokenBalance(wallet_addr, lp).call())
+    price_addr = "0x6Ff2BB2f92E29a2A2E5Fc17e1d0aE5beD4D46240"
+    # price_abi_str = '[{"inputs":[],"name":"emergencyETHWithdrawal","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"emergencyTokenWithdrawal","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"inputs":[],"name":"selfDesturctor","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"target","type":"uint256"}],"name":"SetETHthreshold","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"target","type":"address"}],"name":"SetFactory","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"target","type":"uint256"}],"name":"SetFeeUnit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"target","type":"uint256"}],"name":"SetPoolFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"target","type":"address"}],"name":"SetRouter","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"target","type":"uint256"}],"name":"SetStakeVolFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"target","type":"uint256"}],"name":"SetSwapFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"target","type":"uint256"}],"name":"SetUnstakeProfitFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"target","type":"uint256"}],"name":"SetUnstakeVolFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_target1","type":"address"},{"internalType":"address","name":"_target2","type":"address"},{"internalType":"address","name":"_target3","type":"address"}],"name":"SetUSD","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"},{"inputs":[],"name":"DAI","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"eth_thr","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"factory","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"qty","type":"uint256"},{"internalType":"address","name":"crypto","type":"address"}],"name":"getEstimatedETHforToken","outputs":[{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"qty","type":"uint256"},{"internalType":"address","name":"crypto","type":"address"}],"name":"getEstimatedTokenForETH","outputs":[{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"pair","type":"address"},{"internalType":"uint256","name":"amt","type":"uint256"}],"name":"GetLPPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_pair","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"GetLPWorth","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"pair","type":"address"}],"name":"GetPairName","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"pair","type":"address"}],"name":"GetReserves","outputs":[{"internalType":"uint112","name":"reserve0","type":"uint112"},{"internalType":"uint112","name":"reserve1","type":"uint112"},{"internalType":"uint32","name":"blockTimestampLast","type":"uint32"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"pair","type":"address"}],"name":"GetTotal","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"isOwner","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lp_stake_vol_fee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lp_unstake_profit_fee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lp_unstake_vol_fee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"percentage_unit","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"pool_fee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"rout","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"swap_fee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amt","type":"uint256"}],"name":"TakeStakeVolFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amt","type":"uint256"}],"name":"TakeSwapFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"invest_amt","type":"uint256"},{"internalType":"uint256","name":"curr_amt","type":"uint256"}],"name":"TakeUnstakeProfitFee","outputs":[{"internalType":"bool","name":"","type":"bool"},{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amt","type":"uint256"}],"name":"TakeUnstakeVolFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"USD","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"USDC","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"USDT","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}]'
+    price_abi_str = '[{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"inputs":[],"name":"DAI","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"pair","type":"address"},{"internalType":"uint256","name":"amt","type":"uint256"}],"name":"GetLPPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_pair","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"GetLPWorth","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"pair","type":"address"}],"name":"GetPairName","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"pair","type":"address"}],"name":"GetReserves","outputs":[{"internalType":"uint112","name":"reserve0","type":"uint112"},{"internalType":"uint112","name":"reserve1","type":"uint112"},{"internalType":"uint32","name":"blockTimestampLast","type":"uint32"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"pair","type":"address"}],"name":"GetTotal","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"target","type":"uint256"}],"name":"SetETHthreshold","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"target","type":"address"}],"name":"SetFactory","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"target","type":"uint256"}],"name":"SetFeeUnit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"target","type":"uint256"}],"name":"SetPoolFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"target","type":"address"}],"name":"SetRouter","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"target","type":"uint256"}],"name":"SetStakeVolFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"target","type":"uint256"}],"name":"SetSwapFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_target1","type":"address"},{"internalType":"address","name":"_target2","type":"address"},{"internalType":"address","name":"_target3","type":"address"}],"name":"SetUSD","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"target","type":"uint256"}],"name":"SetUnstakeProfitFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"target","type":"uint256"}],"name":"SetUnstakeVolFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"amt","type":"uint256"}],"name":"TakeStakeVolFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amt","type":"uint256"}],"name":"TakeSwapFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"invest_amt","type":"uint256"},{"internalType":"uint256","name":"curr_amt","type":"uint256"}],"name":"TakeUnstakeProfitFee","outputs":[{"internalType":"bool","name":"","type":"bool"},{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amt","type":"uint256"}],"name":"TakeUnstakeVolFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"USD","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"USDC","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"USDT","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"emergencyETHWithdrawal","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"emergencyTokenWithdrawal","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"eth_thr","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"factory","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"qty","type":"uint256"},{"internalType":"address","name":"crypto","type":"address"}],"name":"getEstimatedETHforToken","outputs":[{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"qty","type":"uint256"},{"internalType":"address","name":"crypto","type":"address"}],"name":"getEstimatedTokenForETH","outputs":[{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"isOwner","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lp_stake_vol_fee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lp_unstake_profit_fee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lp_unstake_vol_fee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"percentage_unit","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"pool_fee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"rout","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"selfDesturctor","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"swap_fee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}]'
+    price_abi = json.loads(price_abi_str)
+    price = w3.eth.contract(address=price_addr, abi=price_abi)
+    lp_price=[]
+    profits=[]
+    invested=[]
+
+    for pair_addr,amount in zip(lp_list,tb):
+        # single_lp_price = price.functions.GetLPPrice(pair_addr,amount ).call()
+        # single_lp_price = price.functions.GetLPPrice(pair_addr,amount ).call()
+        single_lp_price = price.functions.GetLPPrice(pair_addr, int(math.pow(10, 24))).call() / math.pow(10, 24)
+        lp_price.append(single_lp_price*amount)
+        invested_usd = storage.functions.GetUSDUnitPrice(wallet_addr, pair_addr).call() \
+                       / math.pow(10, 18) *amount
+        invested.append(invested_usd)
+        profits.append((single_lp_price*amount-invested_usd)/invested_usd)
+
+    print(len(lp_list))
+    print(lp_list)
+    print(tb)
+    print(profits)
+    print(invested)
+    print("shown ",lp_price)
+    print("Total wealth in USD : ",np.sum(lp_price))
+    return zip(lp_list,tb)
+#
 stake_cont = None
 stor_cont = None
 stor_addr="0xC3eDf24036150B7d90724007a767644812C5973B"
-shib_eth_pair = "0x811beEd0119b4AfCE20D2583EB608C6F7AF1954f" # lp address
-id='' # wallet address
-pk='' # private key address
+
+id='0x-------' # wallet address
+pk='' # private key
 w3=create_w3_from_reserve(key_reserve_list=INFURA_KEY_RESERVE)
 block_number = w3.eth.getBlock('latest')['number']
 
@@ -214,14 +289,22 @@ print("$$$$$$$$$$$$$$$$$")
 ################## end staking
 print("exiting here")
 exit()
+
+#### show balance
+info=show_balance(id)
+print("done showing balance in USD")
+
+###### end show balance
+print("exiting here")
+exit()
 #### unstake
 if stake_cont is None:
     stake_cont = create_stake_contract(w3=w3)
 if stor_cont is None:
     stor_cont = create_storage_contract(w3=w3)
 lp_lists, lp_balances = get_all_lp_bal_2(walletID=id, storage_contract_w3=stor_cont)
+print(lp_lists,lp_balances)
 print("########################################")
-
 
 
 print("LP pair lists:", lp_lists)
@@ -231,10 +314,11 @@ print("balances of contract",cont_balances)
 print("exiting here")
 exit()
 
-lpl= [to_checksum("0xa478c2975ab1ea89e8196811f51a7b7ade33eb11"), to_checksum("0x86fef14c27c78deaeb4349fd959caa11fc5b5d75")] # pair address that you already staked. the LP token is in the smart contract, not in your wallet.
-wdl=[1000, 1000] # lp amount. it's usually a really big number.
+# lpl= [to_checksum("0xa478c2975ab1ea89e8196811f51a7b7ade33eb11"), to_checksum("0x86fef14c27c78deaeb4349fd959caa11fc5b5d75")] # pair address that you already staked. the LP token is in the smart contract, not in your wallet.
+# wdl=[10000000, 10000000] # lp amount. it's usually a really big number.
 
-status,hash = unstake(w3,lp_list=lpl, withdraw_list=wdl, walletID=id, stake_contract_w3=None, max_sliappage=100,
+# it's rare but sometimes there are weird pools among the ones tha take token as fees. in that case you need to withdraw smaller portion than 100% of the lp_balance, like 99~99.7%
+status,hash = unstake(w3,lp_list=lp_lists, withdraw_list=lp_balances, walletID=id, stake_contract_w3=None, max_sliappage=100,
                 walletPrivateKey=pk,gas_buff=1.2,chain_id=1,td=100000)
 
 print("$$$$$$$$$$$$$$$$$")
